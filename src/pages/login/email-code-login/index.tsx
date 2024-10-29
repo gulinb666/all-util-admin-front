@@ -1,55 +1,46 @@
-import React, { useEffect, useState } from 'react';
-import {Button, Flex, Form, Image, Input, Radio, Space, Spin} from 'antd';
-import { SendOutlined } from "@ant-design/icons";
-import { useTranslation } from 'react-i18next';
+import {Button, Flex, Form, Image, Input, Space, Spin} from 'antd';
+import {SendOutlined} from "@ant-design/icons";
+import {useFormRules} from "@/hooks/common/form.ts";
 import CodeUtil from "@/utils/codeUtil.ts";
 import CodeEnum from "@/enum/codeEnum.ts";
+import React, {useEffect, useState} from "react";
 import CookieUtil from "@/utils/cookieUtil.ts";
 import StringUtil from "@/utils/stringUtil.ts";
-import {getCaptcha, verifyImageVerifyCode} from "@/service/api/captcha.ts";
 import {FlatResponseData} from "~/packages/axios";
-import ResultEnum from "@/enum/resultEnum.ts"; // 确保加入翻译功能
+import {getCaptcha, verifyImageVerifyCode} from "@/service/api/captcha.ts";
+import ResultEnum from "@/enum/resultEnum.ts";
 
 export const Component = () => {
+  const { label, isCounting} = useCaptcha();
   const { t } = useTranslation();
   const { toggleLoginModule } = useRouterPush();
-  const { formRules, createConfirmPwdRule } = useFormRules();
 
-  const [forgetPassword] = Form.useForm<ForgetPassword>();
+  const [emailVerifyCodeLogin] = Form.useForm<EmailVerifyCodeLogin>();
+  const { formRules} = useFormRules();
 
-  const [emailOrPhoneVerifyCodeLogin, setEmailOrPhoneVerifyCodeLogin] = useState(0);
+  const startText: string = "获取邮箱验证码";
+  const loadingText: string = "X秒后重新获取邮箱验证码";
+  const endText: string = "重新获取邮箱验证码";
 
-  const loginMethod: LoginMethod[] = [
-    {
-      label: "邮箱验证码找回",
-      key: 0
-    },
-    {
-      label: "手机验证码找回",
-      key: 1
-    }
-  ];
-
-  const [codeUtil] = useState(new CodeUtil());
-  const [text, setText] = useState(codeUtil.getStartText());
-  const [loading, setLoading] = useState(false);
-  const [disabled, setDisabled] = useState(false);
-
-  const loadingText: string = `X秒后重新获取${emailOrPhoneVerifyCodeLogin === 0 ? '邮箱' : '短信'}验证码`;
-  const endText: string = `重新获取${emailOrPhoneVerifyCodeLogin === 0 ? '邮箱' : '短信'}验证码`;
-
+  const codeUtil: CodeUtil = new CodeUtil();
+  codeUtil.setStartText(startText);
   codeUtil.setLoadingText(loadingText);
   codeUtil.setEndText(endText);
+  codeUtil.setEndTime(CodeEnum.END_TIME);
+
+  const [text, setText] = useState(codeUtil.getStartText());
+
+  const [loading, setLoading] = useState(false);
+  const [disabled, setDisabled] = useState(false);
 
   let isEmailVerifyCode: boolean = false;
 
   const [getImageVerifyCodeSpin, setGetImageVerifyCodeSpin] = useState(false);
 
-  const getEmailOrPhoneVerifyCode = async (loading: boolean = true): Promise<void> => {
+  const getEmailVerifyCode = async (loading: boolean = true): Promise<void> => {
     let verifyCaptchaResult: boolean = await verifyCaptcha();
     if (verifyCaptchaResult) {
       if (isEmailVerifyCode) {
-        codeUtil.setEndTime(CodeEnum.END_TIME);
         codeUtil.startCountDown((loadingText: string, loadingStatus: LoadingStatus): void => {
           if (loading == null || loading) {
             setLoading(loadingStatus.loading);
@@ -61,6 +52,9 @@ export const Component = () => {
         })
           .then((endText: string): void => {
             setText(endText);
+          })
+          .finally((): void => {
+            isEmailVerifyCode = false;
           });
       }
     } else {
@@ -68,37 +62,11 @@ export const Component = () => {
     }
   };
 
-  const verifyCaptcha = async (): Promise<boolean> => {
-    let codeId: string = CookieUtil.getCookie(CodeEnum.CODE_ID);
-    if (StringUtil.isNotEmpty(codeId)) {
-      let params: ForgetPassword = await forgetPassword.getFieldsValue();
-      if (StringUtil.isEmpty(params.imageVerify)) {
-        return false;
-      }
-      try {
-        let verifyImageVerifyCodeResult: FlatResponseData<Api.Captcha.VerifyCaptcha> = await verifyImageVerifyCode(codeId, params.imageVerify);
-        if (verifyImageVerifyCodeResult.response.data.code === 1000) {
-          isEmailVerifyCode = true;
-        }
-      } finally {
-        getImageVerifyCode();
-      }
-    }
-    return true;
-  };
-
-  useEffect((): void => {
-    const startText: string = `获取${emailOrPhoneVerifyCodeLogin === 0 ? '邮箱' : '短信'}验证码`;
-    codeUtil.setStartText(startText);
-    setText(startText);
-    forgetPassword.setFieldsValue({ emailOrPhone: emailOrPhoneVerifyCodeLogin });
-  }, [emailOrPhoneVerifyCodeLogin]);
-
   const [endTimeFromLocalStorage] = useState(codeUtil.getEndTimeFromLocalStorage());
 
   useEffect((): void => {
     if (endTimeFromLocalStorage != null) {
-      getEmailOrPhoneVerifyCode(false);
+      getEmailVerifyCode(false);
     }
   }, [endTimeFromLocalStorage]);
 
@@ -134,47 +102,56 @@ export const Component = () => {
       });
   }
 
-  useEffect(() => {
+  useEffect((): void => {
     getImageVerifyCode();
   }, []);
 
-  async function handleSubmit() {
-    const params = await forgetPassword.validateFields();
+  const verifyCaptcha = async (): Promise<boolean> => {
+    let codeId: string = CookieUtil.getCookie(CodeEnum.CODE_ID);
+    if (StringUtil.isNotEmpty(codeId)) {
+      let params: EmailVerifyCodeLogin = await emailVerifyCodeLogin.getFieldsValue();
+      if (StringUtil.isEmpty(params.imageVerify)) {
+        return false;
+      }
+      try {
+        let verifyImageVerifyCodeResult: FlatResponseData<Api.Captcha.VerifyCaptcha> = await verifyImageVerifyCode(codeId, params.imageVerify);
+        if (verifyImageVerifyCodeResult.response.data.code === 1000) {
+          isEmailVerifyCode = true;
+        }
+      } finally {
+        getImageVerifyCode();
+      }
+    }
+    return true;
+  };
+
+  async function handleSubmit(): Promise<void> {
+    const params: EmailVerifyCodeLogin = await emailVerifyCodeLogin.validateFields();
     console.log(params);
+    await verifyCaptcha();
   }
+
+  useKeyPress('enter', (): void => {
+    handleSubmit();
+  });
 
   return (
     <>
-      <h3 className="text-18px text-primary font-medium">忘记密码</h3>
+      <h3 className="text-18px text-primary font-medium">邮箱验证码登录</h3>
       <Form
-        form={forgetPassword}
-        layout="vertical"
-        initialValues={{ emailOrPhone: emailOrPhoneVerifyCodeLogin }} // 设置初始值
         className="pt-24px"
+        form={emailVerifyCodeLogin}
       >
-        <Form.Item name="emailOrPhone">
-          <Radio.Group buttonStyle="solid" onChange={e => setEmailOrPhoneVerifyCodeLogin(e.target.value)}>
-            {
-              loginMethod.map((item: LoginMethod) => {
-                return (
-                  <Radio.Button value={item.key} disabled={disabled} key={item.key}>{item.label}</Radio.Button>
-                );
-              })
-            }
-          </Radio.Group>
+        <Form.Item
+          name="phone"
+          rules={formRules.email}
+        >
+          <Input placeholder="请输入邮箱"></Input>
         </Form.Item>
-        {
-          emailOrPhoneVerifyCodeLogin === 1 ? (
-            <Form.Item name="phone" rules={formRules.phone}>
-              <Input placeholder="请输入手机号码" />
-            </Form.Item>
-          ) : (
-            <Form.Item name="email" rules={formRules.email}>
-              <Input placeholder="请输入邮箱" />
-            </Form.Item>
-          )
-        }
-        <Form.Item name="imageVerify" rules={formRules.imageVerifyCode}>
+        <Form.Item
+          rules={formRules.imageVerifyCode}
+          name="imageVerify"
+        >
           <Flex>
             <Input
               count={{
@@ -196,58 +173,51 @@ export const Component = () => {
             <Button type='link' className='refreshCode' onClick={getImageVerifyCode}>看不清楚？点我换一张！</Button>
           </Flex>
         </Form.Item>
-        {
-          emailOrPhoneVerifyCodeLogin === 1 ? (
-            <Form.Item name="code" rules={formRules.phoneVerifyCode}>
-              <Flex>
-                <Input
-                  placeholder="请输入短信验证码"
-                  count={{ show: true, max: 6 }}
-                  maxLength={6}
-                />
-                <Button
-                  disabled={disabled}
-                  loading={loading}
-                  className="ml-5"
-                  type="primary"
-                  icon={<SendOutlined />}
-                  // @ts-ignore
-                  onClick={getEmailOrPhoneVerifyCode}
-                >{text}</Button>
-              </Flex>
-            </Form.Item>
-          ) : (
-            <Form.Item name="emailCode" rules={formRules.emailVerifyCode}>
-              <Flex>
-                <Input
-                  placeholder="请输入邮箱验证码"
-                  count={{ show: true, max: 6 }}
-                  maxLength={6}
-                />
-                <Button
-                  disabled={disabled}
-                  loading={loading}
-                  className="ml-5"
-                  type="primary"
-                  icon={<SendOutlined />}
-                  // @ts-ignore
-                  onClick={getEmailOrPhoneVerifyCode}
-                >{text}</Button>
-              </Flex>
-            </Form.Item>
-          )
-        }
-        <Form.Item name="password" rules={formRules.pwd}>
-          <Input.Password autoComplete="new-password" placeholder="请输入密码" />
+        <Form.Item
+          name="code"
+          rules={formRules.emailVerifyCode}
+        >
+          <Flex>
+            <Input
+              placeholder="请输入邮箱验证码"
+              count={{
+                show: true,
+                max: 6
+              }}
+              maxLength={6}
+            ></Input>
+            <Button
+              disabled={disabled}
+              loading={loading}
+              className="ml-5"
+              type="primary"
+              icon={<SendOutlined />}
+              // @ts-ignore
+              onClick={getEmailVerifyCode}
+            >{ text }</Button>
+          </Flex>
         </Form.Item>
-        <Form.Item name="confirmPassword" rules={createConfirmPwdRule(forgetPassword)}>
-          <Input.Password autoComplete="new-password" placeholder="请再次输入密码" />
-        </Form.Item>
-        <Space direction="vertical" className="w-full" size={18}>
-          <Button type="primary" size="large" shape="round" block onClick={handleSubmit}>
-            确认修改
+        <Space
+          direction="vertical"
+          className="w-full"
+          size={18}
+        >
+          <Button
+            type="primary"
+            size="large"
+            shape="round"
+            block
+            onClick={handleSubmit}
+          >
+            确认登录
           </Button>
-          <Button size="large" shape="round" block onClick={() => toggleLoginModule('pwd-login')}>
+
+          <Button
+            size="large"
+            shape="round"
+            block
+            onClick={() => toggleLoginModule('pwd-login')}
+          >
             返回
           </Button>
         </Space>
@@ -262,4 +232,4 @@ export const Component = () => {
   );
 };
 
-Component.displayName = 'ResetPwd';
+Component.displayName = 'CodeLogin';

@@ -93,7 +93,7 @@ export function useRouterPush() {
    *
    * @param module
    */
-  async function toggleLoginModule(module: UnionKey.LoginModule) {
+  async function toggleLoginModule(module: string) {
     const query = route.query as Record<string, string>;
 
     return routerPushByKey(`login_${module}`, { query });

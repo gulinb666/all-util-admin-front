@@ -1,0 +1,13 @@
+.code {
+  width: 20%;
+  margin-left: 10px;
+  cursor: pointer;
+}
+.refreshCode {
+  width: 54%;
+  white-space: pre-wrap;
+}
+.bg {
+  background: url("../../assets/imgs/bg.jpg") no-repeat;
+  background-size: 100% 100%;
+}

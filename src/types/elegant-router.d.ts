@@ -49,9 +49,9 @@ declare module "@elegant-router/types" {
     "home": "/home";
     "iframe-page": "/iframe-page/:url";
     "login": "/login";
-    "login_code-login": "code-login";
+    "login_email-code-login": "email-code-login";
+    "login_phone-code-login": "phone-code-login";
     "login_pwd-login": "pwd-login";
-    "login_register": "register";
     "login_reset-pwd": "reset-pwd";
     "manage": "/manage";
     "manage_menu": "menu";
@@ -153,10 +153,10 @@ declare module "@elegant-router/types" {
     | "function_tab"
     | "function_toggle-auth"
     | "home"
-    | "login_code-login"
+    | "login_email-code-login"
     | "login"
+    | "login_phone-code-login"
     | "login_pwd-login"
-    | "login_register"
     | "login_reset-pwd"
     | "manage_menu"
     | "manage_role"

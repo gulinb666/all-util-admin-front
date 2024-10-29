@@ -64,6 +64,23 @@ declare namespace Api {
       roles: string[];
       buttons: string[];
     }
+
+  }
+
+  namespace Captcha {
+
+    interface Captcha {
+      src: string;
+      codeId: string;
+      expireTime: number;
+      timeUnit: string;
+    }
+
+    interface VerifyCaptcha {
+      code: number;
+      message: string;
+    }
+
   }
 
   /**
@@ -140,7 +157,7 @@ declare namespace Api {
     /** user search params */
     type UserSearchParams = CommonType.RecordNullable<
       Pick<Api.SystemManage.User, 'userName' | 'userGender' | 'nickName' | 'userPhone' | 'userEmail' | 'status'> &
-        CommonSearchParams
+      CommonSearchParams
     >;
 
     /** user list */

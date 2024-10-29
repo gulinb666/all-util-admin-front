@@ -5,6 +5,8 @@ import WaveBg from '@/components/stateless/custom/WaveBg';
 import { getDarkMode, getThemeSettings } from '@/store/slice/theme';
 import Header from './modules/Header';
 
+import "../../styles/css/login.css";
+
 const COLOR_WHITE = '#ffffff';
 
 function useBgColor() {
@@ -26,13 +28,12 @@ export function Component() {
 
   return (
     <div
-      className="relative size-full flex-center overflow-hidden bg-layout"
+      className="relative size-full flex-center overflow-hidden bg"
       style={{ backgroundColor: bgColor }}
     >
-      <WaveBg themeColor={bgThemeColor} />
       <Card
         bordered={false}
-        className="relative z-4 w-auto rd-12px"
+        className="relative z-4 w-auto rd-12px opacity-75"
       >
         <div className="w-400px lt-sm:w-300px">
           <Header />

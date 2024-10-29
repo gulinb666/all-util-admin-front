@@ -33,12 +33,7 @@ export const init: Init = async currentFullPath => {
 
     return location;
   }
-
   await store.dispatch(initAuthRoute());
-
-  if (currentFullPath.includes('login')) {
-    return { name: 'root', replace: true };
-  }
 
   return null;
 };

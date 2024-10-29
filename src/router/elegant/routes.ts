@@ -204,12 +204,21 @@ export const generatedRoutes: GeneratedRoute[] = [
     },
     children: [
       {
-        name: 'login_code-login',
-        path: 'code-login',
-        component: 'view.login_code-login',
+        name: 'login_email-code-login',
+        path: 'email-code-login',
+        component: 'view.login_email-code-login',
         meta: {
-          title: 'login_code-login',
-          i18nKey: 'route.login_code-login'
+          title: 'login_email-code-login',
+          i18nKey: 'route.login_email-code-login'
+        }
+      },
+      {
+        name: 'login_phone-code-login',
+        path: 'phone-code-login',
+        component: 'view.login_phone-code-login',
+        meta: {
+          title: 'login_phone-code-login',
+          i18nKey: 'route.login_phone-code-login'
         }
       },
       {
@@ -219,15 +228,6 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'login_pwd-login',
           i18nKey: 'route.login_pwd-login'
-        }
-      },
-      {
-        name: 'login_register',
-        path: 'register',
-        component: 'view.login_register',
-        meta: {
-          title: 'login_register',
-          i18nKey: 'route.login_register'
         }
       },
       {
