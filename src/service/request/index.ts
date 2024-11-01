@@ -9,6 +9,7 @@ import { getAuthorization, handleExpiredRequest, showErrorMsg } from './shared';
 import type { RequestInstanceState } from './type';
 import ResultEnum from "@/enum/resultEnum.ts";
 import {BAD_RESPONSE_ERROR_CODE, ECONNABORTED_ERROR_CODE, NETWORK_ERROR} from "~/packages/axios/src/constant.ts";
+import NetworkStateUtil from "@/utils/networkStateUtil.ts";
 
 const isHttpProxy = import.meta.env.DEV && import.meta.env.VITE_HTTP_PROXY === 'Y';
 const { baseURL, otherBaseURL } = getServiceBaseURL(import.meta.env, isHttpProxy);

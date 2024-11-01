@@ -1,11 +1,16 @@
 import { getPaletteColorByNumber, mixColor } from '@sa/color';
 import { Card } from 'antd';
 import { Outlet } from 'react-router-dom';
-import WaveBg from '@/components/stateless/custom/WaveBg';
 import { getDarkMode, getThemeSettings } from '@/store/slice/theme';
 import Header from './modules/Header';
 
+import bgUrl from "../../assets/imgs/bg.jpg";
+import bgMbUrl from "../../assets/imgs/bg-1.9MB.jpg";
+import bg484KbUrl from "../../assets/imgs/bg-484KB.jpg";
+import bg269KbUrl from "../../assets/imgs/bg-269KB.jpg";
+
 import "../../styles/css/login.css";
+import NetworkStateUtil from "@/utils/networkStateUtil.ts";
 
 const COLOR_WHITE = '#ffffff';
 
@@ -26,10 +31,26 @@ function useBgColor() {
 export function Component() {
   const { bgThemeColor, bgColor } = useBgColor();
 
+  let backgroundImageUrl: any = null;
+  let networkState: NetworkState = NetworkStateUtil.networkState();
+  if (NetworkStateUtil.isOnline()) {
+    // @ts-ignore
+    if (networkState.networkStateRTT < 200) {
+      backgroundImageUrl = bgUrl;
+    } // @ts-ignore
+    else if (networkState.networkStateRTT < 600) {
+      backgroundImageUrl = bgMbUrl;
+    } // @ts-ignore
+    else if (networkState.networkStateRTT < 2200) {
+      backgroundImageUrl = bg484KbUrl;
+    } else {
+      backgroundImageUrl = bg269KbUrl;
+    }
+  }
   return (
     <div
       className="relative size-full flex-center overflow-hidden bg"
-      style={{ backgroundColor: bgColor }}
+      style={{ background: `url(${backgroundImageUrl}) no-repeat`, backgroundSize: "100% 100%" }}
     >
       <Card
         bordered={false}

@@ -7,7 +7,7 @@ class CookieUtil {
    * @param key cookie的key
    * @return {string} 未找到返回空字符串否则返回值
    */
-  getCookie(key: any): string {
+  static getCookie(key: any): string {
 
     const data: string = document.cookie;
 
@@ -27,7 +27,14 @@ class CookieUtil {
     }
   }
 
-  setCookie(key: string, value: string, time?: any, timeUnit?: string): void {
+  /**
+   * 设置cookie
+   * @param key 键
+   * @param value 值
+   * @param time 存储时间
+   * @param timeUnit 时间单位 默认毫秒，可选（天、小时、分钟、秒、毫秒）
+   */
+  static setCookie(key: string, value: string, time?: any, timeUnit?: string): void {
     const times = time;
     const cur: Date = new Date();
     if (timeUnit === TimeUnitEnum.DAY) {
@@ -44,9 +51,13 @@ class CookieUtil {
     document.cookie = key+'=' +encodeURIComponent(value) +';expires=' +(times === undefined ? '' : cur.toUTCString());
   }
 
-  deleteCookie(key: string): void {
+  /**
+   * 删除cookie
+   * @param key 键
+   */
+  static deleteCookie(key: string): void {
 
-    const data: string = this.getCookie(key);
+    const data: string = CookieUtil.getCookie(key);
 
     if ((data as any) !== false) {
       this.setCookie(key, data, -1);
@@ -55,4 +66,4 @@ class CookieUtil {
 
 }
 
-export default new CookieUtil();
+export default CookieUtil;

@@ -7,7 +7,7 @@ class TypeUtil {
    * @param str 字符串
    * @return boolean 为字符串返回true 否则返回false
    */
-  public isString(str: string | String): boolean | Boolean {
+  public static isString(str: string | String): boolean | Boolean {
     if (StringUtil.isEmpty(str)) {
       throw new ReferenceError("str is not defined");
     }
@@ -23,7 +23,7 @@ class TypeUtil {
    * @param num 数字
    * @return boolean 为数字返回true 否则返回false
    */
-  public isNumber(num: number | Number): boolean | Boolean  {
+  public static isNumber(num: number | Number): boolean | Boolean  {
     if (num == null) {
       throw new ReferenceError("num is not defined");
     }
@@ -36,4 +36,4 @@ class TypeUtil {
 
 }
 
-export default new TypeUtil();
+export default TypeUtil;

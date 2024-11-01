@@ -1,6 +1,6 @@
 enum ResultEnum {
 
-  NETWORK_ERROR = "网络错误，请稍后重试",
+  NETWORK_ERROR = "未连接网络，请连接网络后重试",
 
   BACKEND_NO_START_ERROR = "服务器未启动，请联系站点管理员咨询",
 

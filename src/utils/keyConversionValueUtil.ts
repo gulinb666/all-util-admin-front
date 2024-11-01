@@ -3,7 +3,7 @@ import PermissionUtil from "@/utils/permissionUtil.ts";
 
 class KeyConversionValueUtil {
 
-  public keyConversionValue(permissionKey: number): string {
+  public static keyConversionValue(permissionKey: number): string {
     if (!permissionKey == null) {
       throw new ReferenceError("permissionKey is not defined");
     }
@@ -27,7 +27,7 @@ class KeyConversionValueUtil {
     return str;
   }
 
-  public keyConversionValueArray(permissionKey: number): string[] | String[] {
+  public static keyConversionValueArray(permissionKey: number): string[] | String[] {
     if (!permissionKey == null) {
       throw new ReferenceError("permissionKey is not defined");
     }
@@ -45,4 +45,4 @@ class KeyConversionValueUtil {
 
 }
 
-export default new KeyConversionValueUtil();
+export default KeyConversionValueUtil;

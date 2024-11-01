@@ -5,7 +5,7 @@ class StringUtil {
    * @param str 字符串
    * @returns boolean 字符串为空返回true，否则返回false
    */
-  public isEmpty(str: string | String): boolean | Boolean {
+  public static isEmpty(str: string | String): boolean | Boolean {
     return str == null || str.trim() === "" || str.trim().length <= 0;
   }
 
@@ -14,10 +14,10 @@ class StringUtil {
    * @param str
    * @return boolean 字符串不为空返回true，否则返回false
    */
-  public isNotEmpty(str: string | String): boolean | Boolean {
-    return !this.isEmpty(str);
+  public static isNotEmpty(str: string | String): boolean | Boolean {
+    return !StringUtil.isEmpty(str);
   }
 
 }
 
-export default new StringUtil();
+export default StringUtil;
