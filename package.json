@@ -43,6 +43,7 @@
     "dev:prod": "vite --mode prod",
     "gen-route": "sa gen-route",
     "lint": "eslint . --fix",
+    "prepare": "simple-git-hooks",
     "preview": "vite preview",
     "release": "sa release",
     "typecheck": "tsc --noEmit --skipLibCheck",
@@ -112,6 +113,7 @@
     "json5": "2.2.3",
     "lint-staged": "15.2.10",
     "sass": "1.79.4",
+    "simple-git-hooks": "2.11.1",
     "tsx": "4.19.1",
     "typescript": "5.6.2",
     "unplugin-auto-import": "0.18.3",
@@ -120,6 +122,10 @@
     "vite-plugin-inspect": "0.8.7",
     "vite-plugin-remove-console": "2.2.0",
     "vite-plugin-svg-icons": "2.0.1"
+  },
+  "simple-git-hooks": {
+    "commit-msg": "pnpm sa git-commit-verify",
+    "pre-commit": "pnpm typecheck && pnpm lint-staged"
   },
   "lint-staged": {
     "*": "eslint --fix"
