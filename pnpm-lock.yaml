@@ -60,8 +60,8 @@ importers:
         specifier: 23.15.1
         version: 23.15.1
       keepalive-for-react:
-        specifier: 2.0.18
-        version: 2.0.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 3.0.2
+        version: 3.0.2(react-dom@18.3.1(react@18.3.1))(react-router-dom@6.26.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       nprogress:
         specifier: 0.2.0
         version: 0.2.0
@@ -3289,11 +3289,12 @@ packages:
     resolution: {integrity: sha512-ZZow9HBI5O6EPgSJLUb8n2NKgmVWTwCvHGwFuJlMjvLFqlGG6pjirPhtdsseaLZjSibD8eegzmYpUZwoIlj2cQ==}
     engines: {node: '>=4.0'}
 
-  keepalive-for-react@2.0.18:
-    resolution: {integrity: sha512-a6C9HfmxqZMUjqrbTDVIbG9I5GDFIqOCIHGCzvWLECDRLnD2JPPjfFXhQz99FrEIjHi9phncaSberNVOXMgPTw==}
+  keepalive-for-react@3.0.2:
+    resolution: {integrity: sha512-9KFH5XzLH0M8243DMno4Kx/VNVedgrPLYHQkgDJqIK7nJ2RnhRx5lp0SGFiLS6T8TU7LlNO136ooaJTxZSvlFA==}
     peerDependencies:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
+      react-router-dom: '>=6.0.0'
 
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
@@ -4188,6 +4189,7 @@ packages:
 
   react-beautiful-dnd@13.1.1:
     resolution: {integrity: sha512-0Lvs4tq2VcrEjEgDXHjT98r+63drkKEgqyxdA7qD3mvKwga6a5SscbdLPO2IExotU1jW8L0Ksdl0Cj2AF67nPQ==}
+    deprecated: 'react-beautiful-dnd is now deprecated. Context and options: https://github.com/atlassian/react-beautiful-dnd/issues/2672'
     peerDependencies:
       react: ^16.8.5 || ^17.0.0 || ^18.0.0
       react-dom: ^16.8.5 || ^17.0.0 || ^18.0.0
@@ -8484,10 +8486,11 @@ snapshots:
       object.assign: 4.1.5
       object.values: 1.2.0
 
-  keepalive-for-react@2.0.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  keepalive-for-react@3.0.2(react-dom@18.3.1(react@18.3.1))(react-router-dom@6.26.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1):
     dependencies:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
+      react-router-dom: 6.26.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
   keyv@4.5.4:
     dependencies:

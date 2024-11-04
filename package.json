@@ -67,7 +67,7 @@
     "echarts": "5.5.1",
     "framer-motion": "11.11.1",
     "i18next": "23.15.1",
-    "keepalive-for-react": "2.0.18",
+    "keepalive-for-react": "3.0.2",
     "nprogress": "0.2.0",
     "react": "18.3.1",
     "react-beautiful-dnd": "13.1.1",
