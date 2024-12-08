@@ -1,4 +1,4 @@
-import {Button, Flex, Form, Image, Input, Skeleton, Space, Spin} from 'antd';
+import {Button, Flex, Form, Image, Input, Skeleton, Space} from 'antd';
 import {SendOutlined} from "@ant-design/icons";
 import {useFormRules} from "@/hooks/common/form.ts";
 import CodeUtil from "@/utils/codeUtil.ts";
@@ -8,7 +8,8 @@ import CookieUtil from "@/utils/cookieUtil.ts";
 import StringUtil from "@/utils/stringUtil.ts";
 import {FlatResponseData} from "~/packages/axios";
 import {getCaptcha, verifyImageVerifyCode} from "@/service/api/captcha.ts";
-import ResultEnum from "@/enum/resultEnum.ts";
+import {adminLoginSendEmailVerifyCode, adminLoginVerifyEmailCode} from "@/service/api/email.ts";
+import imageVerifyCodeError from "@/assets/imgs/imageVerifyCodeError.png";
 
 export const Component = () => {
   const { label, isCounting} = useCaptcha();
@@ -33,19 +34,43 @@ export const Component = () => {
   const [loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState(false);
 
-  let isEmailVerifyCode: boolean = false;
+  let isEmailVerifyCode: boolean = true;
 
   const [ imageVerifyCodeLoading, setImageVerifyCodeLoading ] = useState(true);
 
   const getEmailVerifyCode = async (loading: boolean = true): Promise<void> => {
-    let verifyCaptchaResult: boolean = await verifyCaptcha();
-    if (verifyCaptchaResult) {
+    const params: EmailVerifyCodeLogin = await emailVerifyCodeLogin.getFieldsValue();
+    const email: string = params.email;
+    if (!email) {
+      window.$message?.error("请先输入邮箱");
+      return;
+    }
+    let emailRegExp: RegExp = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+    if (!emailRegExp.test(email)) {
+      window.$message?.error("邮箱格式不正确");
+      return;
+    }
+    try {
+      await verifyCaptcha();
+      let isSend: boolean = false;
       if (isEmailVerifyCode) {
         codeUtil.startCountDown((loadingText: string, loadingStatus: LoadingStatus): void => {
           if (loading == null || loading) {
             setLoading(loadingStatus.loading);
           } else {
             setLoading(loading);
+          }
+          if (!isSend) {
+            isSend = true;
+            let emailKey: string = CookieUtil.getCookie(CodeEnum.EMAIL_CODE_ID);
+            adminLoginSendEmailVerifyCode(email, StringUtil.isEmpty(emailKey) ? "" : emailKey)
+              .then((res: FlatResponseData<Api.Email.SendEmailVerifyCode>) => {
+                let data = res.response.data.data;
+                if (res.response.data.code === 1000) {
+                  window.$message?.success("邮箱验证码下发成功，请注意查收！");
+                  CookieUtil.setCookie(CodeEnum.EMAIL_CODE_ID, data.codeKey, data.expireTime, data.timeUnit);
+                }
+              });
           }
           setDisabled(loadingStatus.disabled);
           setText(loadingText);
@@ -57,8 +82,8 @@ export const Component = () => {
             isEmailVerifyCode = false;
           });
       }
-    } else {
-      window.$message?.error("请先填写图形验证码");
+    } catch (err: any) {
+      window.$message?.error(err.message);
     }
   };
 
@@ -81,54 +106,85 @@ export const Component = () => {
     codeId: ""
   });
 
+  const [imageLoaded, setImageLoaded] = useState(false); // 控制图像是否加载
+
   function getImageVerifyCode(): void {
     setImageVerifyCodeLoading(true);
-    let codeId: string | null = CookieUtil.getCookie(CodeEnum.CODE_ID);
-    let imageVerifyCodeId: string = "";
-    if (codeId != null) {
-      if (StringUtil.isNotEmpty(codeId)) {
-        imageVerifyCodeId = codeId;
-      }
+    setImageLoaded(false); // 重置图像加载状态
+
+    const codeId: string | null = CookieUtil.getCookie(CodeEnum.CODE_ID);
+    let imageVerifyCodeId: string = '';
+
+    if (codeId != null && StringUtil.isNotEmpty(codeId)) {
+      imageVerifyCodeId = codeId;
     }
+
     getCaptcha(imageVerifyCodeId)
       .then((res: FlatResponseData<Api.Captcha.Captcha>): void => {
         if (res.data != null) {
           setImageVerifyCode(res.data);
           CookieUtil.setCookie(CodeEnum.CODE_ID, res.data.codeId, res.data.expireTime, res.data.timeUnit);
+          setImageLoaded(true); // 成功加载图像
         }
+      })
+      .catch(() => {
+        setImageLoaded(false); // 加载失败保持为未加载
       })
       .finally(() => {
         setImageVerifyCodeLoading(false);
       });
   }
 
-  useEffect((): void => {
+  useEffect(() => {
     getImageVerifyCode();
   }, []);
 
-  const verifyCaptcha = async (): Promise<boolean> => {
+  const verifyCaptcha = async (): Promise<void> => {
     let codeId: string = CookieUtil.getCookie(CodeEnum.CODE_ID);
     if (StringUtil.isNotEmpty(codeId)) {
       let params: EmailVerifyCodeLogin = await emailVerifyCodeLogin.getFieldsValue();
       if (StringUtil.isEmpty(params.imageVerify)) {
-        return false;
+        throw new Error("请输入图形验证码");
+      }
+      if (params.imageVerify.length !== 6) {
+        throw new Error("图形验证码必须为6位");
       }
       try {
         let verifyImageVerifyCodeResult: FlatResponseData<Api.Captcha.VerifyCaptcha> = await verifyImageVerifyCode(codeId, params.imageVerify);
-        if (verifyImageVerifyCodeResult.response.data.code === 1000) {
+        let code = verifyImageVerifyCodeResult.response.data.code;
+        if (code === 1000) {
           isEmailVerifyCode = true;
+        } else {
+          isEmailVerifyCode = false;
         }
       } finally {
         getImageVerifyCode();
       }
+    } else {
+      getImageVerifyCode();
+      throw new Error("图形验证码已过期，请重新获取");
     }
-    return true;
   };
 
   async function handleSubmit(): Promise<void> {
     const params: EmailVerifyCodeLogin = await emailVerifyCodeLogin.validateFields();
-    console.log(params);
-    await verifyCaptcha();
+    try {
+      await verifyEmailCode(params.emailVerifyCode);
+    } catch (err: any) {
+      window.$message?.error(err.message);
+    }
+  }
+
+  async function verifyEmailCode(code: string): Promise<void> {
+    if (StringUtil.isEmpty(code)) {
+      throw new Error("请输入验证码");
+    }
+    let emailCodeKey: string = CookieUtil.getCookie(CodeEnum.EMAIL_CODE_ID);
+    if (StringUtil.isEmpty(emailCodeKey)) {
+      throw new Error("邮箱验证码已过期，请重新获取");
+    } else {
+      await adminLoginVerifyEmailCode(emailCodeKey, code);
+    }
   }
 
   useKeyPress('enter', (): void => {
@@ -143,52 +199,66 @@ export const Component = () => {
         form={emailVerifyCodeLogin}
       >
         <Form.Item
-          name="phone"
+          name="email"
           rules={formRules.email}
         >
-          <Input placeholder="请输入邮箱"></Input>
+          <Input
+            placeholder="请输入邮箱"
+            allowClear={true}
+          ></Input>
         </Form.Item>
         <Form.Item
           rules={formRules.imageVerifyCode}
           name="imageVerify"
         >
-          <Flex>
+          <Flex align={'center'}>
             <Input
-              count={{
-                show: true,
-                max: 6
-              }}
+              count={{ show: true, max: 6 }}
               maxLength={6}
               placeholder="请输入图形验证码"
+              allowClear={true}
+              className="inputCode"
             />
-            {
-              imageVerifyCodeLoading
-                ?
-                (
-                  <Skeleton.Image
-                    active={true}
-                    className="code"
-                  />
-                )
-                :
-                (
+            {imageVerifyCodeLoading ? (
+              <Skeleton.Image
+                active={true}
+                className="code"
+                style={{ width: "90%", height: 50, marginLeft: 5 }}
+              />
+            ) : (
+              <>
+                {imageLoaded ? (
                   <Image
                     src={imageVerifyCode.src}
                     alt={imageVerifyCode.codeId}
                     className="code"
-                    placeholder={true}
                     preview={false}
-                    title='看不清楚？点我换一张！'
-                    fallback="data:image/png;base64,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"
+                    title="看不清楚？点我换一张！"
+                    fallback={imageVerifyCodeError}
                     onClick={getImageVerifyCode}
+                    onError={() => setImageLoaded(false)} // 加载失败时更新状态
                   />
-                )
-            }
-            <Button type='link' className='refreshCode' onClick={getImageVerifyCode}>看不清楚？点我换一张！</Button>
+                ) : (
+                  <Image
+                    src={imageVerifyCodeError} // 显示错误图像
+                    alt="错误图像"
+                    className="code"
+                    preview={false}
+                  />
+                )}
+              </>
+            )}
+            <Button
+              type="link"
+              className="refreshCode"
+              onClick={getImageVerifyCode}
+            >
+              看不清楚？点我换一张！
+            </Button>
           </Flex>
         </Form.Item>
         <Form.Item
-          name="code"
+          name="emailVerifyCode"
           rules={formRules.emailVerifyCode}
         >
           <Flex>
@@ -199,6 +269,7 @@ export const Component = () => {
                 max: 6
               }}
               maxLength={6}
+              allowClear={true}
             ></Input>
             <Button
               disabled={disabled}

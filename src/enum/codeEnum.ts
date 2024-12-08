@@ -2,7 +2,9 @@ enum CodeEnum {
 
   END_TIME = 60,
 
-  CODE_ID = "codeId"
+  CODE_ID = "codeId",
+
+  EMAIL_CODE_ID = "emailCodeId"
 
 }
 

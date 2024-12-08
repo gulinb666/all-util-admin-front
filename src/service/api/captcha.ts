@@ -4,15 +4,16 @@ import StringUtil from "@/utils/stringUtil.ts";
 
 
 function getCaptcha(codeId: string | String): Promise<FlatResponseData<Api.Captcha.Captcha>> {
-  let url: string = "";
+  let data = null;
   if (StringUtil.isNotEmpty(codeId)) {
-    url = `/admin-feign/captcha/getImageVerifyCode?codeId=${codeId}`;
-  } else {
-    url = '/admin-feign/captcha/getImageVerifyCode';
+    data = {
+      codeId: codeId
+    };
   }
   return request<Api.Captcha.Captcha>({
-    url: url,
-    method: "GET"
+    url: "/admin/captcha/getImageVerifyCode",
+    method: "GET",
+    params: data
   });
 }
 
@@ -24,8 +25,12 @@ function verifyImageVerifyCode(codeId: string | String, code: string | String): 
     throw new ReferenceError("code is be must not null");
   }
   return request<Api.Captcha.VerifyCaptcha>({
-    url: `/admin-feign/captcha/verifyImageVerifyCode?codeId=${codeId}&code=${code}`,
-    method: "GET"
+    url: '/admin/captcha/verifyImageVerifyCode',
+    method: "GET",
+    params: {
+      codeId: codeId,
+      code: code
+    }
   });
 }
 

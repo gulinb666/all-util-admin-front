@@ -67,6 +67,11 @@ declare namespace Api {
 
   }
 
+  /**
+   * namespace Captcha
+   *
+   * backend api module: "admin/captcha or user/captcha"
+   */
   namespace Captcha {
 
     interface Captcha {
@@ -79,6 +84,24 @@ declare namespace Api {
     interface VerifyCaptcha {
       code: number;
       message: string;
+    }
+
+  }
+
+  /**
+   * namespace Email
+   *
+   * backend api module: "admin/email"
+   */
+  namespace Email {
+    interface SendEmailVerifyCode {
+      codeKey: string;
+      expireTime: number;
+      timeUnit: string;
+    }
+
+    interface VerifyEmailCode {
+
     }
 
   }

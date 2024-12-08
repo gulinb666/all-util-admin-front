@@ -7,6 +7,8 @@ import { localStg } from '@/utils/storage';
 import { getServiceBaseURL } from '@/utils/service';
 import { getAuthorization, handleExpiredRequest, showErrorMsg } from './shared';
 import type { RequestInstanceState } from './type';
+import {BAD_RESPONSE_ERROR_CODE, ECONNABORTED_ERROR_CODE} from "~/packages/axios/src/constant.ts";
+import ResultEnum from "@/enum/resultEnum.ts";
 
 const isHttpProxy = import.meta.env.DEV && import.meta.env.VITE_HTTP_PROXY === 'Y';
 const { baseURL, otherBaseURL } = getServiceBaseURL(import.meta.env, isHttpProxy);
@@ -105,6 +107,15 @@ export const request = createFlatRequest<App.Service.Response, RequestInstanceSt
       // get backend error message and code
       if (error.code === BACKEND_ERROR_CODE) {
         message = error.response?.data?.message || message;
+        backendErrorCode = String(error.response?.data?.code || '');
+      } else if (error.code === ECONNABORTED_ERROR_CODE) {
+        message = ResultEnum.TIME_OUT_ERROR;
+        backendErrorCode = String(error.response?.data?.code || '');
+      } else if (error.code  === BAD_RESPONSE_ERROR_CODE) {
+        message = ResultEnum.BACKEND_NO_START_ERROR;
+        backendErrorCode = String(error.response?.data?.code || '');
+      } else {
+        message = ResultEnum.NETWORK_ERROR;
         backendErrorCode = String(error.response?.data?.code || '');
       }
 

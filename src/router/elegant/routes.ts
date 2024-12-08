@@ -208,7 +208,7 @@ export const generatedRoutes: GeneratedRoute[] = [
         path: 'email-code-login',
         component: 'view.login_email-code-login',
         meta: {
-          title: 'login_email-code-login',
+          title: '邮箱验证码登录',
           i18nKey: 'route.login_email-code-login'
         }
       },
@@ -217,7 +217,7 @@ export const generatedRoutes: GeneratedRoute[] = [
         path: 'phone-code-login',
         component: 'view.login_phone-code-login',
         meta: {
-          title: 'login_phone-code-login',
+          title: '短信验证码登录',
           i18nKey: 'route.login_phone-code-login'
         }
       },
@@ -235,7 +235,7 @@ export const generatedRoutes: GeneratedRoute[] = [
         path: 'reset-pwd',
         component: 'view.login_reset-pwd',
         meta: {
-          title: 'login_reset-pwd',
+          title: '忘记密码',
           i18nKey: 'route.login_reset-pwd'
         }
       }
