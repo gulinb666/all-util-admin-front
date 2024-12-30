@@ -59,8 +59,9 @@ declare namespace Api {
     }
 
     interface UserInfo {
-      userId: string;
-      userName: string;
+      id: string;
+      username: string;
+      nickname: string;
       roles: string[];
       buttons: string[];
     }
@@ -94,13 +95,38 @@ declare namespace Api {
    * backend api module: "admin/email"
    */
   namespace Email {
+
     interface SendEmailVerifyCode {
-      codeKey: string;
-      expireTime: number;
-      timeUnit: string;
+      email: string
+      codeKey?: string
     }
 
     interface VerifyEmailCode {
+      key: string;
+      code: string;
+    }
+
+  }
+
+  namespace Admin {
+
+    interface Admin {
+      username: string;
+      password: string;
+    }
+
+  }
+
+  namespace Role {
+
+    interface Role {
+      userId: string;
+    }
+
+  }
+
+  namespace Menu {
+    interface Menu {
 
     }
 

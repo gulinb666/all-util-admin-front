@@ -4,7 +4,7 @@ import { $t } from '@/locales';
 import StringUtil from "@/utils/stringUtil.ts";
 export function useFormRules() {
   const patternRules = {
-    userName: {
+    username: {
       pattern: REG_USER_NAME,
       message: "用户名必须为3-16位之间",
       validateTrigger: 'onChange'
@@ -14,7 +14,7 @@ export function useFormRules() {
       message: "手机号格式不正确",
       validateTrigger: 'onChange'
     },
-    pwd: {
+    password: {
       pattern: REG_PWD,
       message: "密码必须在6-16位之间",
       validateTrigger: 'onChange'
@@ -40,9 +40,9 @@ export function useFormRules() {
   } satisfies Record<string, App.Global.FormRule>;
 
   const formRules = {
-    userName: [createRequiredRule("请输入用户名"), patternRules.userName],
+    username: [createRequiredRule("请输入用户名"), patternRules.username],
     phone: [createRequiredRule("请输入手机号"), patternRules.phone],
-    pwd: [createRequiredRule("请输入密码"), patternRules.pwd],
+    password: [createRequiredRule("请输入密码"), patternRules.password],
     phoneVerifyCode: [createRequiredRule("请输入短信验证码"), patternRules.phoneVerifyCode],
     email: [createRequiredRule("请输入邮箱"), patternRules.email],
     imageVerifyCode: [createRequiredRule("请输入图形验证码"), patternRules.imageVerifyCode],

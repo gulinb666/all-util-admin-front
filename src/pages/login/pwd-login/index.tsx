@@ -1,17 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Checkbox, Flex, Form, Image, Input, Skeleton, Space } from 'antd';
 import { useLogin } from '@/hooks/common/login';
-import { getCaptcha } from '@/service/api/captcha.ts';
+import {getCaptcha, verifyImageVerifyCode} from '@/service/api/captcha.ts';
 import type { FlatResponseData } from '~/packages/axios';
 import StringUtil from '@/utils/stringUtil.ts';
 import CodeEnum from '@/enum/codeEnum.ts';
 import CookieUtil from '@/utils/cookieUtil.ts';
 
 import imageVerifyCodeError from '@/assets/imgs/imageVerifyCodeError.png';
+import {adminLogin, getAdminInfoByToken} from "@/service/api/admin.ts";
+import {windows} from "rimraf";
+import TimeUnitEnum from "@/enum/timeUnitEnum.ts";
+import DateUtil from "@/utils/dateUtil.ts";
+import {router} from "@/router";
+import {localStg} from "@/utils/storage.ts";
+import {getRole} from "@/service/api/role.ts";
+import {getMenuList} from "@/service/api/menu.ts";
 
-type AccountKey = 'super' | 'admin' | 'user';
 interface Account {
-  key: AccountKey;
   label: string;
   userName: string;
   password: string;
@@ -67,6 +73,60 @@ export function Component() {
 
   async function handleSubmit() {
     const params: PwdLogin = await pwdLogin.validateFields();
+    let codeKey: string = CookieUtil.getCookie(CodeEnum.CODE_ID);
+    if (StringUtil.isEmpty(codeKey)) {
+      window.$message?.error("图形验证码已过期，请重新获取");
+      getImageVerifyCode();
+      return;
+    }
+    let verifyImageCode: FlatResponseData<Api.Captcha.VerifyCaptcha> = await verifyImageVerifyCode(codeKey, params.imageVerify);
+    if (verifyImageCode.response.data.code !== 1000) {
+      getImageVerifyCode();
+      return;
+    }
+    let data: Api.Admin.Admin = {
+      username: params.username,
+      password: params.password
+    };
+    let adminLoginResult: FlatResponseData<Api.Admin.Admin> = await adminLogin(data);
+    let response = adminLoginResult.response.data;
+    if (response.code === 1000) {
+      // 获取用户的角色信息
+      let getAdminInfoByTokenResult: FlatResponseData = await getAdminInfoByToken();
+      let res = getAdminInfoByTokenResult.response.data;
+      if (res.code === 1000) {
+        localStg.set("userInfo", res.data);
+      }
+      let roleId: string = res.data.roleId;
+      getRole(roleId)
+        .then((result: FlatResponseData<Api.Role.Role>): void => {
+          let information = result.response.data;
+          if (information.code === 1000) {
+            getMenuList()
+              .then((menuResult: FlatResponseData<Api.Menu.Menu>): void => {
+                let menuRes = menuResult.response.data;
+                if (menuRes.code === 1000) {
+                  window.$notification?.success({
+                    message: "欢迎登录",
+                    description: `${res.data.nickname}${DateUtil.getTimeGreeting()}`
+                  });
+                  // router.push("/home");
+                }
+              })
+              .catch(error => {
+                console.log(error);
+                getImageVerifyCode();
+              });
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          getImageVerifyCode();
+        });
+      // CookieUtil.setCookie(response.data.tokenName, response.data.tokenValue, response.data.tokenTimeout, TimeUnitEnum.SECONDS);
+    } else {
+      getImageVerifyCode();
+    }
     // toLogin()
   }
 
@@ -84,14 +144,14 @@ export function Component() {
 
   return (
     <>
-      <h3 className="text-18px text-primary font-medium">{t('page.login.pwdLogin.title')}</h3>
+      <h3 className="text-18px text-primary font-medium">密码登录</h3>
       <Form
         className="pt-24px"
         form={pwdLogin}
       >
         <Form.Item
-          rules={formRules.userName}
-          name="userName"
+          rules={formRules.username}
+          name="username"
         >
           <Input
             placeholder="请输入用户名"
@@ -100,7 +160,7 @@ export function Component() {
         </Form.Item>
 
         <Form.Item
-          rules={formRules.pwd}
+          rules={formRules.password}
           name="password"
         >
           <Input.Password

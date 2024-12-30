@@ -6,6 +6,7 @@ import { createAppSlice } from '../../createAppSlice';
 import { cacheTabs } from '../tab';
 import { resetRouteStore } from '../route';
 import { clearAuthStorage, getToken, getUserInfo } from './shared';
+import {getAdminInfoByToken} from "@/service/api/admin.ts";
 
 const initialState = {
   token: getToken(),
@@ -24,7 +25,7 @@ export const authSlice = createAppSlice({
           localStg.set('token', loginToken.token);
           localStg.set('refreshToken', loginToken.refreshToken);
 
-          const { data: info, error: userInfoError } = await fetchGetUserInfo();
+          const { data: info, error: userInfoError } = await getAdminInfoByToken();
 
           if (!userInfoError) {
             // 2. store user info
@@ -62,7 +63,7 @@ export const { login, resetAuth } = authSlice.actions;
 export const getUerName = (): AppThunk<string> => (_, getState) => {
   const pass = selectToken(getState());
 
-  return pass ? selectUserInfo(getState()).userName : '';
+  return pass ? selectUserInfo(getState()).nickname : '';
 };
 
 /** is super role in static route */

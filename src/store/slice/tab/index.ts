@@ -63,11 +63,11 @@ export const tabSlice = createSlice({
     changeTabLabel(state, { payload }: PayloadAction<{ label?: string; index: number }>) {
       const { label, index } = payload;
 
-      if (label) {
-        state.tabs[index].i18nKey = label;
-      } else {
-        state.tabs[index].i18nKey = state.tabs[index].oldLabel;
-      }
+      // if (label) {
+      //   state.tabs[index].i18nKey = label;
+      // } else {
+      //   state.tabs[index].i18nKey = state.tabs[index].oldLabel;
+      // }
     },
     setTabs(state, { payload }: PayloadAction<App.Global.Tab[]>) {
       state.tabs = payload;

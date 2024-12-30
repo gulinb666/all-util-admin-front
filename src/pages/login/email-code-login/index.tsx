@@ -64,7 +64,7 @@ export const Component = () => {
             isSend = true;
             let emailKey: string = CookieUtil.getCookie(CodeEnum.EMAIL_CODE_ID);
             adminLoginSendEmailVerifyCode(email, StringUtil.isEmpty(emailKey) ? "" : emailKey)
-              .then((res: FlatResponseData<Api.Email.SendEmailVerifyCode>) => {
+              .then((res: FlatResponseData<Api.Email.SendEmailVerifyCode>): void => {
                 let data = res.response.data.data;
                 if (res.response.data.code === 1000) {
                   window.$message?.success("邮箱验证码下发成功，请注意查收！");

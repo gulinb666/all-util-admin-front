@@ -19,6 +19,14 @@ function adminLogin(options: Api.Admin.Admin): Promise<FlatResponseData<Api.Admi
   });
 }
 
+function getAdminInfoByToken(): Promise<FlatResponseData> {
+  return request({
+    url: "/admin/getAdminInfoByToken",
+    method: 'GET'
+  });
+}
+
 export {
-  adminLogin
+  adminLogin,
+  getAdminInfoByToken
 };

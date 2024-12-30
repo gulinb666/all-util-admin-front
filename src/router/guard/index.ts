@@ -19,7 +19,6 @@ export const init: Init = async currentFullPath => {
   await store.dispatch(initConstantRoute());
 
   const isLogin = Boolean(localStg.get('token'));
-
   if (!isLogin) {
     const loginRoute: RouteKey = 'login';
     const routeHome = getRouteHome(store.getState());
@@ -65,16 +64,17 @@ export const createRouteGuard: BeforeEach = (to, _, blockerOrJump) => {
   }
 
   const rootRoute: RouteKey = 'root';
-  const loginRoute: RouteKey = 'login';
+  const loginRoute: RouteKey = 'login_pwd-login';
   const noAuthorizationRoute: RouteKey = '403';
 
   const isLogin = Boolean(localStg.get('token'));
   const needLogin = !to.meta.constant;
   const routeRoles = to.meta.roles || [];
 
-  const hasRole = selectUserInfo(store.getState()).roles.some(role => routeRoles.includes(role));
-
-  const hasAuth = store.dispatch(isStaticSuper()) || !routeRoles.length || hasRole;
+  // const hasRole = selectUserInfo(store.getState()).roles.some(role => routeRoles.includes(role));
+  //
+  // const hasAuth = store.dispatch(isStaticSuper()) || !routeRoles.length || hasRole;
+  const hasAuth = store.dispatch(isStaticSuper()) || !routeRoles.length;
 
   const routeSwitches: CommonType.StrategicPattern[] = [
     // if it is login route when logged in, then switch to the root page
@@ -95,6 +95,7 @@ export const createRouteGuard: BeforeEach = (to, _, blockerOrJump) => {
     {
       condition: !isLogin && needLogin,
       callback: () => {
+
         return blockerOrJump({ name: loginRoute, query: { redirect: to.fullPath } });
       }
     },

@@ -10,6 +10,7 @@ import { ROOT_ROUTE } from '@/router/routes/builtin';
 import type { AppThunk } from '../../index';
 import { createAppSlice } from '../../createAppSlice';
 import { filterAuthRoutesByRoles, getCacheRouteNames, sortRoutesByOrder } from './shared';
+import {getMenuList} from "@/service/api/menu.ts";
 
 interface InitialStateType {
   authRoutes: ElegantConstRoute[];
@@ -172,8 +173,10 @@ export const initConstantRoute = (): AppThunk => async dispatch => {
   if (constantRouteMode === 'static') {
     dispatch(setConstantRoutes(staticRoute.constantRoutes));
   } else {
-    const { data, error } = await fetchGetConstantRoutes();
+    // const { data, error } = await fetchGetConstantRoutes();
+    const {data, error} = await getMenuList();
     if (!error) {
+      // @ts-ignore
       dispatch(setConstantRoutes(data));
     } else {
       dispatch(setConstantRoutes(staticRoute.constantRoutes));

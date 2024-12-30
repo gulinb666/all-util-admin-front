@@ -198,9 +198,9 @@ export const generatedRoutes: GeneratedRoute[] = [
     layout: 'blank',
     meta: {
       title: 'login',
-      i18nKey: 'route.login',
       constant: true,
-      hideInMenu: true
+      hideInMenu: true,
+      i18nKey: 'route.login'
     },
     children: [
       {
@@ -226,7 +226,7 @@ export const generatedRoutes: GeneratedRoute[] = [
         path: 'pwd-login',
         component: 'view.login_pwd-login',
         meta: {
-          title: 'login_pwd-login',
+          title: '密码登录',
           i18nKey: 'route.login_pwd-login'
         }
       },

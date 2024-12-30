@@ -26,7 +26,7 @@ function verifyImageVerifyCode(codeId: string | String, code: string | String): 
   }
   return request<Api.Captcha.VerifyCaptcha>({
     url: '/admin/captcha/verifyImageVerifyCode',
-    method: "GET",
+    method: "POST",
     params: {
       codeId: codeId,
       code: code

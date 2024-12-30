@@ -3,9 +3,10 @@ import { store } from '@/store';
 import { localStg } from '@/utils/storage';
 import { fetchRefreshToken } from '../api';
 import type { RequestInstanceState } from './type';
+import CookieUtil from "@/utils/cookieUtil.ts";
 
 export function getAuthorization() {
-  const token = localStg.get('token');
+  const token = CookieUtil.getCookie('accessToken');
   const Authorization = token ? `Bearer ${token}` : null;
 
   return Authorization;

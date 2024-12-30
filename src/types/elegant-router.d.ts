@@ -97,6 +97,7 @@ declare module "@elegant-router/types" {
     | "document_procomponents"
     | "document_antd"
     | "logout"
+    | "login_pwd-login"
   >;
 
   /**
@@ -249,7 +250,7 @@ declare module "@elegant-router/types" {
         component: `view.${K}`;
       }
     : never;
-  
+
   /**
    * the center level route
    */
@@ -273,7 +274,7 @@ declare module "@elegant-router/types" {
         layout?:"base" | "blank"
       }
     : never;
-  
+
   /**
    * the custom first level route
    */
